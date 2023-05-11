@@ -32,12 +32,15 @@ def get_realtime_price(request):
     coin_list = COINS.split(',')
     cmc = CoinMarketCapAPI(CRYPTO_API)
     r = cmc.cryptocurrency_quotes_latest(symbol='BTC,ETH,BNB,ADA,USDT')
-
+    print("rrssss")
+    print(r)
     coins_latest_info = {}
     for coin in coin_list:
         coins_latest_info[coin] = r.data[coin]['quote']['USD']['price']
 
     crypto_price_data = json.dumps(coins_latest_info)
+    print("crypto_price_data")
+    print(crypto_price_data)
     return JsonResponse({
         # "data": data
         'crypto_price_data': crypto_price_data
@@ -50,8 +53,9 @@ def get_history_data(request):
         # data={"BTC":0.2,"ETH":0.4,"BNB":0.5,"ADA":0.2,"USDT":0.7}
 
     crypto_type = str(request.body, encoding="utf-8")
+    print("crypto_type")
     print(crypto_type)
-    r = redis.StrictRedis(host='localhost', port=6379, db=0)
+    # r = redis.StrictRedis(host='localhost', port=6379, db=0)
     today_millis = int(round(time.time() * 1000))
     age_90_millis = today_millis - 90 * 24 * 60 * 60 * 1000
     today_timeStamp = today_millis / 1000
@@ -66,15 +70,12 @@ def get_history_data(request):
     elif crypto_type == 'BNB':
         request_currency = 'bitfinex:EOSUSD'
 
-    if r.exists(r_key) == 0:
-        url = 'http://api.bitdataset.com/v1/ohlcv/history/' + request_currency + '?period=d1&start=' + str(
-            age_90_millis) + '&limit=99'
-        headers = {'apikey': 'a4c7f4f4-6506-451a-b35c-631e7a2949b9'}
-        response = requests.get(url, headers=headers)
-        r.set(r_key, response.text)
-        hi = json.loads(response.text)
-    else:
-        hi = json.loads(r.get(r_key))
+    url = 'http://api.bitdataset.com/v1/ohlcv/history/' + request_currency + '?period=d1&start=' + str(
+        age_90_millis) + '&limit=99'
+    headers = {'apikey': 'a4c7f4f4-6506-451a-b35c-631e7a2949b9'}
+    response = requests.get(url, headers=headers)
+    # r.set(r_key, response.text)
+    hi = json.loads(response.text)
 
     return JsonResponse({
         # "data": data

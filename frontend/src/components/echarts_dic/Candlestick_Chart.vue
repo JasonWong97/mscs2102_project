@@ -5,7 +5,7 @@
         Candlestick Chart
       </div>
 <div>
-  <el-select v-model="value" placeholder="请选择" @change="get_history_data(value)">
+  <el-select v-model="value" placeholder="Please select" @change="get_history_data(value)">
     <el-option
       v-for="item in options"
       :key="item.value"
